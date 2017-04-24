@@ -144,31 +144,39 @@
     var earth,moon,sun,europa;
     function computeGraph() {
         sun = new window.Planet(100000, 0.0005, 0, 0, _textures['sun'],true);
-
-        var merc = new window.Planet(3031, 1/24/58.7, 1/24/87.96 ,36 , _textures['mercury']);
-        var venus = new window.Planet(7521, 1/24/243, 1/24/224.68 ,67.2 , _textures['venus']);
-         earth = new window.Planet(7926, 1/24, 1/24/365, 93, _textures['earth']);
-
-            moon = new window.Planet(1131, 1/24/50, 1/24/3, 18, _textures['moon']);
-            earth.add(moon);
-
-        var mars = new window.Planet(4222, 1/24/1.026, 1/24/686.98, 141.6, _textures['mars']);
-            var phobos = new window.Planet(200, 1/30/24, 1/24/8, 9, _textures['phobos']);
-            mars.add(phobos);
-            var deimos = new window.Planet(290, 1/30/24/4.90, 1/24/16, 12, _textures['deimos']);
-            mars.add(deimos);
+        //
+        // var merc = new window.Planet(3031, 1/24/58.7, 1/24/87.96 ,50 , _textures['mercury']);
+        // var venus = new window.Planet(7521, 1/24/243, 1/24/224.68 ,67.2 , _textures['venus']);
+        //  earth = new window.Planet(7926, 1/24, 1/24/365, 93, _textures['earth']);
+        //
+        //     moon = new window.Planet(1131, 1/24/50, 1/24/3, 18, _textures['moon']);
+        //     earth.add(moon);
+        //
+        // var mars = new window.Planet(4222, 1/24/1.026, 1/24/686.98, 141.6, _textures['mars']);
+        //     var phobos = new window.Planet(200, 1/30/24, 1/24/8, 9, _textures['phobos']);
+        //     mars.add(phobos);
+        //     var deimos = new window.Planet(290, 1/30/24/4.90, 1/24/16, 12, _textures['deimos']);
+        //     mars.add(deimos);
 
         var jupiter = new window.Planet(68729, 1/9.84, 1/24/365/11.862, 283.6, _textures['jupiter']);
-            var io = new window.Planet(700, 1/30/24, 1/24/6, 50, _textures['io']);
-            jupiter.add(io);
-            europa = new window.Planet(550, 0, 1/10/9.84, 55, _textures['europa']);
-            jupiter.add(europa);
-            var calisto = new window.Planet(500, 1/30/24/3, 1/24/8.9, 59, _textures['calisto']);
-            jupiter.add(calisto);
-        sun.add( merc );
-        sun.add( venus );
-        sun.add( earth );
-        sun.add( mars );
+        jupiter.setCustomFunction(function (t) {
+            //x2/a2 + y2 /b2 ; ellipse
+            var a  = this._distance,
+            b = this._distance *1.6;
+            return new THREE.Vector3(a*Math.cos(t),0,b * Math.sin(t));
+        }); // Sorry i prefer this way ! :)
+
+
+            // var io = new window.Planet(700, 1/30/24, 1/24/6, 50, _textures['io']);
+            // jupiter.add(io);
+            // europa = new window.Planet(550, 0, 1/10/9.84, 55, _textures['europa']);
+            // jupiter.add(europa);
+            // var calisto = new window.Planet(500, 1/30/24/3, 1/24/8.9, 59, _textures['calisto']);
+            // jupiter.add(calisto);
+        // sun.add( merc );
+        // sun.add( venus );
+        // sun.add( earth );
+        // sun.add( mars );
         sun.add( jupiter );
         sun.addToScene( scene );
         sun.showTrajectory(scene);

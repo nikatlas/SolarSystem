@@ -5,6 +5,12 @@
     var PI2 = 2 * Math.PI;
     var SLOWDOWN = 1/1;
 
+    var normalFunction = function (t) {
+        return new THREE.Vector3(
+            this._distance * Math.sin( PI2* this._pfreq * t + this.phase),
+            0,
+            this._distance * Math.cos( PI2 * this._pfreq * t + this.phase) );
+    }
     function Planet(radius, sfreq, pfreq, distance,texture, light) {
 
         radius = 0.0005 * radius; // Adjust values so that we have a nice effect...
@@ -12,18 +18,13 @@
         sfreq = 10*sfreq * SLOWDOWN;
         pfreq = 100 *pfreq * SLOWDOWN;
         ///////////////////////////////////
-        var
-        segments = 64,
-        material = new THREE.LineBasicMaterial( { color: 0xffffff } ),
-        geometry = new THREE.CircleGeometry( distance, segments );
-        // Remove center vertex
-        geometry.vertices.shift();
 
-        geometry.rotateX(Math.PI/2);
 
-        var debug = new THREE.Line( geometry, material );
         ///////////////////////////////////
-        this._debug = debug;
+
+
+        this._customfn = normalFunction;
+        this._debug = null;
         this._distance = distance;
         this._pfreq    = pfreq;
         this._sfreq    = sfreq;
@@ -95,11 +96,14 @@
         }
         this._animate(t);
     };
+    Planet.prototype.setCustomFunction = function (fn) {
+        this._customfn = fn; // no error handling sry
+    };
     Planet.prototype._animate = function (t) {
-        var vector = new THREE.Vector3(
-            this._distance * Math.sin( PI2* this._pfreq * t + this.phase),
-            0,
-            this._distance * Math.cos( PI2 * this._pfreq * t + this.phase) );
+        var vector;
+        if( this._customfn )
+            vector = this._customfn(t);
+        else return;
         this._entity.position.copy(vector);
         this._mesh.rotation.y = PI2 * this._sfreq * t ;
     };
@@ -112,7 +116,22 @@
         }
         scene.add(this._entity);
     };
+    Planet.prototype.createTrajectory = function () {
+        var fn = normalFunction;
+        if(this._customfn){
+            fn = this._customfn;
+        }
+
+
+        var material = new THREE.LineBasicMaterial({ color: 0x0000ff });var geometry = new THREE.Geometry();
+        for( var i = 0 ; i < 5000 ; i ++ ){
+            geometry.vertices.push(fn.call(this, i/500));
+        }
+
+        this._debug = new THREE.Line(geometry,material);
+    };
     Planet.prototype.showTrajectory = function (scene) {
+        this.createTrajectory();
         for (var i in this._children) {
             this._children[i].showTrajectory(this._entity);
         }
